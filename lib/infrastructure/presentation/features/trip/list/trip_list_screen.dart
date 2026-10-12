@@ -23,6 +23,22 @@ class TripListScreen extends StatelessWidget {
 class _TripListScreen extends StatelessWidget {
   const _TripListScreen();
 
+  Future<void> _openDetails(
+    BuildContext context,
+    TripListState state,
+    Trip trip,
+  ) async {
+    final id = trip.id;
+    if (id == null) {
+      return;
+    }
+
+    await context.push(AppRoutes.tripDetailsPath(id));
+    if (context.mounted) {
+      await state.loadTrips();
+    }
+  }
+
   Future<void> _openEditor(
     BuildContext context,
     TripListState state, {
@@ -152,7 +168,7 @@ class _TripListScreen extends StatelessWidget {
                     subtitle: Text('${trip.startDate} - ${trip.endDate}'),
                     onTap: switch (state.isBusy(trip)) {
                       true => null,
-                      false => () => _openEditor(context, state, trip: trip),
+                      false => () => _openDetails(context, state, trip),
                     },
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,

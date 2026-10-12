@@ -19,6 +19,9 @@ abstract class AppTripRepository {
 
 /// Interface for managing trip actions.
 abstract class AppTripUseCase {
+  /// Returns one trip belonging to the current user.
+  Future<Result<Trip, AppTripError>> getTrip(int id, int userId);
+
   /// Creates a trip and returns its identifier.
   Future<Result<int, AppTripError>> addTrip(Trip trip);
 

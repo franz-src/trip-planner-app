@@ -14,6 +14,27 @@ class _AppTripUseCase implements AppTripUseCase {
   final AppTripRepository _appTripRepository;
 
   @override
+  Future<Result<Trip, AppTripError>> getTrip(int id, int userId) async {
+    if (id <= 0 || userId <= 0) {
+      return Result.failure(AppTripError.invalidTrip);
+    }
+
+    final result = await _appTripRepository.getAllTrips(userId);
+    switch (result) {
+      case Failure(:final error):
+        return Result.failure(error);
+      case Success(:final value):
+        for (final trip in value) {
+          if (trip.id == id) {
+            return Result.success(trip);
+          }
+        }
+    }
+
+    return Result.failure(AppTripError.notFound);
+  }
+
+  @override
   Future<Result<int, AppTripError>> addTrip(Trip trip) async {
     final error = AppTripRules.validateTrip(trip);
     if (error != null) {
