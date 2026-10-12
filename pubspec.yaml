@@ -40,13 +40,10 @@ dependencies:
   sqflite: ^2.4.2
   path: ^1.9.1
   flutter_map: ^8.2.2
-  flutter_map_location_marker: ^10.1.0
-  flutter_polyline_points: ^3.1.0
   latlong2: ^0.9.1
   http: ^1.5.0
   shared_preferences: ^2.5.3
   geolocator: ^14.0.2
-  permission_handler: ^12.0.1
   intl: ^0.20.2
   image_picker: ^1.2.0
   pdf: ^3.11.3
@@ -84,23 +81,6 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  assets:
-    - assets/trip-recomendations/andes/
-    - assets/trip-recomendations/br-northeast/
-    - assets/trip-recomendations/br-south/
-    - assets/trip-recomendations/br-southeast/
-    - assets/trip-recomendations/canada/
-    - assets/trip-recomendations/central-eu/
-    - assets/trip-recomendations/east-asia/
-    - assets/trip-recomendations/italy/
-    - assets/trip-recomendations/mexico-caribbean/
-    - assets/trip-recomendations/north-africa/
-    - assets/trip-recomendations/oceania/
-    - assets/trip-recomendations/south-africa/
-    - assets/trip-recomendations/southeast-asia/
-    - assets/trip-recomendations/us-east-coast/
-    - assets/trip-recomendations/us-west-coast/
-    - assets/trip-recomendations/western-eu/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

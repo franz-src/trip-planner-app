@@ -114,6 +114,11 @@ class _TripDetailsScreen extends StatelessWidget {
           return ListView(
             padding: const EdgeInsets.all(25),
             children: [
+              TextButton.icon(
+                onPressed: () => context.push(AppRoutes.tripMapPath(trip.id!)),
+                icon: const Icon(Icons.map),
+                label: Text(intl.fullscreenMap),
+              ),
               Text(
                 trip.title,
                 style: TextStyle(

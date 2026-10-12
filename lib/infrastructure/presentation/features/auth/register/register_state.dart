@@ -17,13 +17,22 @@ class RegisterState with ChangeNotifier {
 
   var _loading = false;
   var _disposed = false;
+  AuthError? _error;
 
   /// Whether a registration attempt is in progress.
   bool get loading => _loading;
 
+  /// The latest registration failure.
+  AuthError? get error => _error;
+
   /// Attempts to register and returns the authentication module's result.
   Future<Result<void, AuthError>> attemptRegister() async {
+    if (_loading) {
+      return Result.failure(AuthError.unexpected);
+    }
+
     _loading = true;
+    _error = null;
     notifyListeners();
 
     try {
@@ -33,7 +42,16 @@ class RegisterState with ChangeNotifier {
         password: controllerPassword.text,
       );
 
-      return await authUseCase.attemptRegister(credentials);
+      final result = await authUseCase.attemptRegister(credentials);
+      if (result case Failure(:final error)) {
+        _error = error;
+      }
+
+      return result;
+    } catch (e) {
+      _error = AuthError.unexpected;
+
+      return Result.failure(AuthError.unexpected);
     } finally {
       _loading = false;
 

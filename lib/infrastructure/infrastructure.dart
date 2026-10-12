@@ -1,46 +1,62 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trip_planner/infrastructure/database/database.dart';
-import 'package:trip_planner/modules/app_user/app_user_repository.dart';
-import 'package:trip_planner/modules/app_user/app_user_spec.dart';
-import 'package:trip_planner/modules/app_user/app_user_use_case.dart';
+import 'package:trip_planner/modules/user/user_repository.dart';
+import 'package:trip_planner/modules/user/user_spec.dart';
+import 'package:trip_planner/modules/user/user_use_case.dart';
 import 'package:trip_planner/modules/auth/auth_repository.dart';
 import 'package:trip_planner/modules/auth/auth_spec.dart';
 import 'package:trip_planner/modules/auth/auth_use_case.dart';
 import 'package:trip_planner/modules/settings/settings_repository.dart';
 import 'package:trip_planner/modules/settings/settings_spec.dart';
 import 'package:trip_planner/modules/settings/settings_use_case.dart';
-import 'package:trip_planner/modules/app_trip/app_trip_repository.dart';
-import 'package:trip_planner/modules/app_trip/app_trip_spec.dart';
-import 'package:trip_planner/modules/app_trip/app_trip_use_case.dart';
-import 'package:trip_planner/modules/app_person/app_person_spec.dart';
-import 'package:trip_planner/modules/app_person/app_person_use_case.dart';
-import 'package:trip_planner/modules/app_stop/app_stop_spec.dart';
-import 'package:trip_planner/modules/app_stop/app_stop_repository.dart';
-import 'package:trip_planner/modules/app_stop/app_stop_use_case.dart';
+import 'package:trip_planner/modules/trip/trip_repository.dart';
+import 'package:trip_planner/modules/trip/trip_spec.dart';
+import 'package:trip_planner/modules/trip/trip_use_case.dart';
+import 'package:trip_planner/modules/person/person_spec.dart';
+import 'package:trip_planner/modules/person/person_use_case.dart';
+import 'package:trip_planner/modules/stop/stop_spec.dart';
+import 'package:trip_planner/modules/stop/stop_repository.dart';
+import 'package:trip_planner/modules/stop/stop_use_case.dart';
+import 'package:trip_planner/modules/search/search_spec.dart';
+import 'package:trip_planner/modules/search/search_repository.dart';
+import 'package:trip_planner/modules/search/search_use_case.dart';
 
 /// Global instance for authentication use case.
 late final AuthUseCase authUseCase;
 
-/// Global instance for app user use case.
-late final AppUserUseCase appUserUseCase;
+/// Global instance for user use case.
+late final UserUseCase userUseCase;
 
 /// Global instance for settings use case.
 late final SettingsUseCase settingsUseCase;
 
-/// Global instance for app trip use case.
-late final AppTripUseCase appTripUseCase;
+/// Global instance for trip use case.
+late final TripUseCase tripUseCase;
 
 /// Global instance for travel group use case.
-late final AppPersonUseCase appPersonUseCase;
+late final PersonUseCase personUseCase;
 
 /// Global instance for itinerary stop use case.
-late final AppStopUseCase appStopUseCase;
+late final StopUseCase stopUseCase;
 
-/// Initializes the application use cases.
-Future<void> initialize() async {
+/// Global instance for destination search use case.
+late final SearchUseCase searchUseCase;
+
+Future<void>? _initialization;
+
+/// Initializes the application use cases once, allowing failed attempts to retry.
+Future<void> initialize() => _initialization ??= _initialize().catchError((
+  Object error,
+  StackTrace stack,
+) {
+  _initialization = null;
+  Error.throwWithStackTrace(error, stack);
+});
+
+Future<void> _initialize() async {
   // Database
-  final database = NewTripPlannerDatabase();
+  final database = TripPlannerDatabase();
 
   // Storage
   final storage = FlutterSecureStorage();
@@ -48,15 +64,16 @@ Future<void> initialize() async {
 
   // Repositories
   final authRepository = newAuthRepository(database, storage);
-  final appUserRepository = newAppUserRepository(storage, database);
+  final userRepository = newUserRepository(storage, database);
   final settingsRepository = newSettingsRepository(preferences);
-  final appTripRepository = newAppTripRepository(database);
+  final tripRepository = newTripRepository(database);
 
   // Use cases
   authUseCase = newAuthUseCase(authRepository);
-  appUserUseCase = newAppUserUseCase(appUserRepository);
+  userUseCase = newUserUseCase(userRepository);
   settingsUseCase = newSettingsUseCase(settingsRepository);
-  appTripUseCase = newAppTripUseCase(appTripRepository);
-  appPersonUseCase = newAppPersonUseCase();
-  appStopUseCase = newAppStopUseCase(newAppStopRepository());
+  tripUseCase = newTripUseCase(tripRepository);
+  personUseCase = newPersonUseCase();
+  stopUseCase = newStopUseCase(newStopRepository());
+  searchUseCase = newSearchUseCase(newSearchRepository());
 }

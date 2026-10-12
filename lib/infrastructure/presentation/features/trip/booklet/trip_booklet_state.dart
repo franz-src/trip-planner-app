@@ -8,7 +8,7 @@ import 'package:trip_planner/infrastructure/pdf/trip_booklet_exporter.dart';
 import 'package:trip_planner/infrastructure/presentation/app/intl/app_localizations.dart';
 import 'package:trip_planner/infrastructure/presentation/app_state.dart';
 import 'package:trip_planner/infrastructure/presentation/features/trip/details/trip_details_state.dart';
-import 'package:trip_planner/shared/errors/error_app_trip.dart';
+import 'package:trip_planner/shared/errors/error_trip.dart';
 import 'package:trip_planner/shared/errors/error_trip_booklet.dart';
 
 /// State for collecting memories and generating a trip booklet.
@@ -39,7 +39,7 @@ class TripBookletState with ChangeNotifier {
   bool get loading => _details.loading;
 
   /// The latest trip loading failure.
-  AppTripError? get error => _details.error;
+  TripError? get error => _details.error;
 
   /// Whether PDF generation is in progress.
   bool get generating => _generating;
@@ -149,7 +149,7 @@ class TripBookletState with ChangeNotifier {
     if (_generating ||
         _picking ||
         currentTrip == null ||
-        currentTrip.userId != _appState.appUser?.id) {
+        currentTrip.userId != _appState.user?.id) {
       return Result.failure(TripBookletError.unexpected);
     }
 

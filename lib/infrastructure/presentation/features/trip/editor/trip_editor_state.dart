@@ -10,10 +10,10 @@ import 'package:trip_planner/entities/entity_stop_experience.dart';
 import 'package:trip_planner/entities/entity_trip.dart';
 import 'package:trip_planner/infrastructure/infrastructure.dart';
 import 'package:trip_planner/infrastructure/presentation/app_state.dart';
-import 'package:trip_planner/shared/errors/error_app_person.dart';
-import 'package:trip_planner/shared/errors/error_app_stop.dart';
-import 'package:trip_planner/shared/errors/error_app_trip.dart';
-import 'package:trip_planner/shared/validations/validation_app_trip.dart';
+import 'package:trip_planner/shared/errors/error_person.dart';
+import 'package:trip_planner/shared/errors/error_stop.dart';
+import 'package:trip_planner/shared/errors/error_trip.dart';
+import 'package:trip_planner/shared/validations/validation_trip.dart';
 
 /// State for creating and editing trips.
 class TripEditorState with ChangeNotifier {
@@ -68,8 +68,8 @@ class TripEditorState with ChangeNotifier {
   bool _loading = true;
   bool _saving = false;
   bool _disposed = false;
-  AppTripError? _error;
-  AppTripError? _loadError;
+  TripError? _error;
+  TripError? _loadError;
 
   /// Selected means of transport.
   String get transport => _transport;
@@ -99,13 +99,13 @@ class TripEditorState with ChangeNotifier {
   bool get readOnly => _original?.concluded ?? false;
 
   /// Whether the session is unavailable.
-  bool get signedOut => _appState.appUser == null;
+  bool get signedOut => _appState.user == null;
 
   /// The latest loading or saving failure.
-  AppTripError? get error => _error;
+  TripError? get error => _error;
 
   /// A failure encountered while restoring the session or trip.
-  AppTripError? get loadError => _loadError;
+  TripError? get loadError => _loadError;
 
   Future<void> _loadTrip() async {
     final session = await _appState.refreshUser();
@@ -115,11 +115,11 @@ class TripEditorState with ChangeNotifier {
 
     switch (session) {
       case Failure():
-        _loadError = AppTripError.unexpected;
+        _loadError = TripError.unexpected;
       case Success(:final value):
         _userId = value?.id;
         if (value != null && tripId != null) {
-          final result = await appTripUseCase.getAllTrips(value.id);
+          final result = await tripUseCase.getAllTrips(value.id);
           if (_disposed) {
             return;
           }
@@ -139,7 +139,7 @@ class TripEditorState with ChangeNotifier {
               }
 
               if (_original == null) {
-                _loadError = AppTripError.notFound;
+                _loadError = TripError.notFound;
               }
           }
         }
@@ -165,8 +165,8 @@ class TripEditorState with ChangeNotifier {
   }
 
   /// Adds or updates a validated group member.
-  Result<Person, AppPersonError> savePerson() {
-    final result = appPersonUseCase.createPerson(
+  Result<Person, PersonError> savePerson() {
+    final result = personUseCase.createPerson(
       controllerName.text,
       controllerAge.text,
     );
@@ -232,7 +232,7 @@ class TripEditorState with ChangeNotifier {
   }
 
   Future<void> _findAddress(LatLng position, int request) async {
-    final result = await appStopUseCase.getAddressFromCoordinates(position);
+    final result = await stopUseCase.getAddressFromCoordinates(position);
     if (_disposed ||
         request != _addressRequest ||
         controllerLocation.text.isNotEmpty) {
@@ -274,11 +274,11 @@ class TripEditorState with ChangeNotifier {
   }
 
   /// Adds or updates a validated stop while preserving related identifiers.
-  Result<Stop, AppStopError> saveStop() {
+  Result<Stop, StopError> saveStop() {
     final latitude = double.tryParse(controllerLatitude.text);
     final longitude = double.tryParse(controllerLongitude.text);
     if (latitude == null || longitude == null) {
-      return Result.failure(AppStopError.invalidCoordinates);
+      return Result.failure(StopError.invalidCoordinates);
     }
 
     final index = _stopIndex;
@@ -298,8 +298,8 @@ class TripEditorState with ChangeNotifier {
       longitude: longitude,
       stopExperiences: List.of(_experiences),
     );
-    final result = appStopUseCase.validateStop(stop);
-    if (result is Success<Stop, AppStopError>) {
+    final result = stopUseCase.validateStop(stop);
+    if (result is Success<Stop, StopError>) {
       if (index == null) {
         _stops.add(stop);
       } else {
@@ -326,7 +326,7 @@ class TripEditorState with ChangeNotifier {
         .map((stop) => LatLng(stop.latitude, stop.longitude))
         .toList();
     _route = points;
-    final result = await appStopUseCase.getRoute(points);
+    final result = await stopUseCase.getRoute(points);
     if (_disposed || request != _routeRequest) {
       return;
     }
@@ -339,18 +339,18 @@ class TripEditorState with ChangeNotifier {
   }
 
   /// Saves the trip through the application trip module.
-  Future<Result<int, AppTripError>> saveTrip() async {
+  Future<Result<int, TripError>> saveTrip() async {
     final userId = _userId;
     if (_loading ||
         _saving ||
         userId == null ||
-        _appState.appUser?.id != userId ||
+        _appState.user?.id != userId ||
         (tripId != null && _original == null)) {
-      return Result.failure(AppTripError.invalidTrip);
+      return Result.failure(TripError.invalidTrip);
     }
 
     if (readOnly) {
-      return Result.failure(AppTripError.concludedTrip);
+      return Result.failure(TripError.concludedTrip);
     }
 
     final start = switch (_stops.isEmpty) {
@@ -372,7 +372,7 @@ class TripEditorState with ChangeNotifier {
       stops: List.of(_stops),
       mapImage: _original?.mapImage,
     );
-    final error = AppTripRules.validateTrip(trip);
+    final error = TripRules.validateTrip(trip);
     if (error != null) {
       _error = error;
       notifyListeners();
@@ -386,7 +386,7 @@ class TripEditorState with ChangeNotifier {
     try {
       await WidgetsBinding.instance.endOfFrame;
       if (_disposed) {
-        return Result.failure(AppTripError.unexpected);
+        return Result.failure(TripError.unexpected);
       }
 
       final boundary = mapKey.currentContext?.findRenderObject();
@@ -402,21 +402,49 @@ class TripEditorState with ChangeNotifier {
         }
       }
 
-      if (_disposed || _appState.appUser?.id != userId) {
-        return Result.failure(AppTripError.invalidTrip);
+      if (_disposed || _appState.user?.id != userId) {
+        return Result.failure(TripError.invalidTrip);
       }
 
       if (tripId == null) {
-        return await appTripUseCase.addTrip(trip);
+        final result = await tripUseCase.addTrip(trip);
+        if (result is Success<int, TripError>) {
+          _appState.markTripsChanged();
+          if (!_disposed) {
+            controllerTitle.clear();
+            controllerName.clear();
+            controllerAge.clear();
+            controllerLocation.clear();
+            controllerStartDate.clear();
+            controllerEndDate.clear();
+            controllerLatitude.clear();
+            controllerLongitude.clear();
+            _personIndex = null;
+            _stopIndex = null;
+            _group = [];
+            _stops = [];
+            _route = [];
+            _experiences = [];
+            _transport = 'Car';
+            _routeRequest++;
+            _addressRequest++;
+          }
+        }
+
+        return result;
       }
 
-      final result = await appTripUseCase.updateTrip(trip);
+      final result = await tripUseCase.updateTrip(trip);
+      if (result is Success<void, TripError>) {
+        _appState.markTripsChanged();
+      }
+
       return switch (result) {
         Success() => Result.success(tripId!),
         Failure(:final error) => Result.failure(error),
       };
     } catch (e) {
-      return Result.failure(AppTripError.unexpected);
+      return Result.failure(TripError.unexpected);
     } finally {
       _saving = false;
       if (!_disposed) {

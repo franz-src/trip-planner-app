@@ -10,7 +10,8 @@ import 'package:trip_planner/infrastructure/presentation/app/intl/app_localizati
 import 'package:trip_planner/infrastructure/presentation/app_state.dart';
 import 'package:trip_planner/infrastructure/presentation/features/trip/editor/trip_editor_state.dart';
 import 'package:trip_planner/infrastructure/presentation/routes.dart';
-import 'package:trip_planner/shared/validations/validation_app_stop.dart';
+import 'package:trip_planner/shared/validations/validation_stop.dart';
+import 'package:trip_planner/infrastructure/presentation/features/map/trip_map_arguments.dart';
 
 class TripEditorScreen extends StatelessWidget {
   const TripEditorScreen({super.key, this.tripId});
@@ -20,6 +21,7 @@ class TripEditorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
+      key: ValueKey(tripId),
       create: (_) => TripEditorState(context.read<AppState>(), tripId: tripId),
       child: const _TripEditorScreen(),
     );
@@ -39,7 +41,7 @@ class _TripEditorScreen extends StatelessWidget {
     BuildContext context,
     TextEditingController controller,
   ) async {
-    final initial = AppStopRules.parseDate(controller.text) ?? DateTime.now();
+    final initial = StopRules.parseDate(controller.text) ?? DateTime.now();
     var first = DateTime(1900);
     var last = DateTime(2100);
     if (initial.isBefore(first)) {
@@ -292,6 +294,7 @@ class _TripEditorScreen extends StatelessWidget {
                               label: intl.tripTitle,
                             ),
                             DropdownButtonFormField<String>(
+                              key: ValueKey(state.transport),
                               initialValue: state.transport,
                               decoration: InputDecoration(
                                 labelText: intl.transport,
@@ -439,6 +442,26 @@ class _TripEditorScreen extends StatelessWidget {
                                   ],
                                 ),
                               ),
+                            ),
+                            TextButton.icon(
+                              onPressed: () => context.push(
+                                AppRoutes.map,
+                                extra: TripMapArguments(
+                                  editor: state,
+                                  onMapTap: (mapContext, position) => _editStop(
+                                    mapContext,
+                                    state,
+                                    position: position,
+                                  ),
+                                  onStopTap: (mapContext, index) => _editStop(
+                                    mapContext,
+                                    state,
+                                    index: index,
+                                  ),
+                                ),
+                              ),
+                              icon: const Icon(Icons.fullscreen),
+                              label: Text(intl.fullscreenMap),
                             ),
                             FilledButton.icon(
                               onPressed: () => _editStop(context, state),

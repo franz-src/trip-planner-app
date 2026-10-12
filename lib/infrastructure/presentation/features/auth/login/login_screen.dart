@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:trip_planner/entities/entity_result.dart';
 import 'package:trip_planner/infrastructure/presentation/app/components/button_component.dart';
 import 'package:trip_planner/infrastructure/presentation/app/components/text_field_component.dart';
 import 'package:trip_planner/infrastructure/presentation/app/components/trip_planner_logo_component.dart';
 import 'package:trip_planner/infrastructure/presentation/app/intl/app_localizations.dart';
 import 'package:trip_planner/infrastructure/presentation/features/auth/login/login_state.dart';
 import 'package:trip_planner/infrastructure/presentation/routes.dart';
+import 'package:trip_planner/infrastructure/presentation/app_state.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -15,7 +15,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => LoginState(),
+      create: (_) => LoginState(context.read<AppState>()),
       child: const _LoginScreen(),
     );
   }
@@ -28,6 +28,8 @@ class _LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final intl = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final from = GoRouterState.of(context).uri.queryParameters['from'];
+    final parameters = <String, String>{if (from != null) 'from': from};
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -75,28 +77,35 @@ class _LoginScreen extends StatelessWidget {
                         Consumer<LoginState>(
                           builder: (context, state, child) => Column(
                             children: [
-                              TextFieldComponent(
-                                controller: state.controllerEmail,
-                                label: intl.email,
+                              AbsorbPointer(
+                                absorbing: state.loading,
+                                child: Column(
+                                  children: [
+                                    TextFieldComponent(
+                                      controller: state.controllerEmail,
+                                      label: intl.email,
+                                    ),
+                                    TextFieldComponent(
+                                      controller: state.controllerPassword,
+                                      label: intl.password,
+                                      isPassword: true,
+                                    ),
+                                    ButtonComponent(
+                                      function: () => state.attemptLogin(),
+                                      message: intl.signIn,
+                                    ),
+                                  ],
+                                ),
                               ),
-                              TextFieldComponent(
-                                controller: state.controllerPassword,
-                                label: intl.password,
-                                isPassword: true,
-                              ),
-                              ButtonComponent(
-                                function: () async {
-                                  final result = await state.attemptLogin();
-                                  if (!context.mounted) {
-                                    return;
-                                  }
-
-                                  if (result case Success()) {
-                                    context.go(AppRoutes.trips);
-                                  }
-                                },
-                                message: intl.signIn,
-                              ),
+                              if (state.loading)
+                                const LinearProgressIndicator(),
+                              if (state.error case final error?)
+                                Text(
+                                  error.translate(intl),
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.error,
+                                  ),
+                                ),
                             ],
                           ),
                         ),
@@ -131,7 +140,12 @@ class _LoginScreen extends StatelessWidget {
                               ),
                             ),
                             GestureDetector(
-                              onTap: () => context.push(AppRoutes.register),
+                              onTap: () => context.go(
+                                Uri(
+                                  path: AppRoutes.register,
+                                  queryParameters: parameters,
+                                ).toString(),
+                              ),
                               child: Text(
                                 intl.signUpLink,
                                 style: TextStyle(

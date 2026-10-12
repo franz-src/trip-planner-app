@@ -1,52 +1,90 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
+import 'package:trip_planner/entities/entity_result.dart';
 import 'package:trip_planner/modules/stop/stop_spec.dart';
+import 'package:trip_planner/shared/errors/error_stop.dart';
 
-// Stop's Repository
-class StopRepository implements IStopRepository {
-  static const String _baseUrl = 'https://nominatim.openstreetmap.org';
-  
-  static const Map<String, String> _headers = {
-    'User-Agent': 'TripPlanner/1.0 (trip_planner_app)',
-  };
+StopRepository newStopRepository() => const _StopRepository();
+
+class _StopRepository implements StopRepository {
+  const _StopRepository();
 
   @override
-  Future<String?> getAddressFromCoordinates(LatLng position) async {
+  Future<Result<String?, StopError>> getAddressFromCoordinates(
+    LatLng position,
+  ) async {
     try {
-      final url = Uri.parse('$_baseUrl/reverse?lat=${position.latitude}&lon=${position.longitude}&format=json');
-
-      final response = await http.get(url, headers: _headers);
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final address = data['address'];
-        return address['city'] ?? address['suburb'] ?? address['country'];
+      final uri = Uri.https('nominatim.openstreetmap.org', '/reverse', {
+        'lat': position.latitude.toString(),
+        'lon': position.longitude.toString(),
+        'format': 'json',
+      });
+      final response = await http
+          .get(
+            uri,
+            headers: {'User-Agent': 'TripPlanner/1.0 (trip_planner_app)'},
+          )
+          .timeout(const Duration(seconds: 15));
+      if (response.statusCode != 200) {
+        return Result.failure(StopError.unexpected);
       }
 
-      return null;
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      final address = data['address'] as Map<String, dynamic>?;
+      final name =
+          address?['city'] ??
+          address?['town'] ??
+          address?['village'] ??
+          address?['suburb'] ??
+          address?['country'];
+
+      return Result.success(name as String?);
     } catch (e) {
-      throw Exception("Error in Get Address From Coordinates Repository: $e");
+      return Result.failure(StopError.unexpected);
     }
   }
 
   @override
-  Future<List<LatLng>> getRoute(List<LatLng> points) async {
-    if (points.length < 2) return points;
-
-    final coords = points.map((p) => "${p.longitude},${p.latitude}").join(";");
-
-    final url = Uri.parse("https://router.project-osrm.org/route/v1/driving/$coords?overview=full&geometries=geojson");
+  Future<Result<List<LatLng>, StopError>> getRoute(List<LatLng> points) async {
+    if (points.length < 2) {
+      return Result.success(points);
+    }
 
     try {
-      final response = await http.get(url);
-      if (response.statusCode != 200) return points;
+      final coordinates = points
+          .map((point) => '${point.longitude},${point.latitude}')
+          .join(';');
+      final uri = Uri.https(
+        'router.project-osrm.org',
+        '/route/v1/driving/$coordinates',
+        {'overview': 'full', 'geometries': 'geojson'},
+      );
+      final response = await http.get(uri).timeout(const Duration(seconds: 15));
+      if (response.statusCode != 200) {
+        return Result.failure(StopError.unexpected);
+      }
 
-      final data = json.decode(response.body);
-      final route = data['routes'][0]['geometry']['coordinates'] as List;
-      return route.map((coord) => LatLng(coord[1].toDouble(), coord[0].toDouble())).toList();
-    } catch(e) {
-      throw Exception("Error in Get Route Repository: $e");
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      final routes = data['routes'] as List;
+      if (routes.isEmpty) {
+        return Result.failure(StopError.unexpected);
+      }
+
+      final geometry = routes.first['geometry']['coordinates'] as List;
+      final route = geometry
+          .map(
+            (point) => LatLng(
+              (point[1] as num).toDouble(),
+              (point[0] as num).toDouble(),
+            ),
+          )
+          .toList();
+
+      return Result.success(route);
+    } catch (e) {
+      return Result.failure(StopError.unexpected);
     }
   }
 }

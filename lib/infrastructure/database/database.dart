@@ -7,22 +7,20 @@ import 'package:trip_planner/infrastructure/database/user_experiences_table.dart
 import 'package:trip_planner/infrastructure/database/users_table.dart';
 
 /// Class to manage the database connection.
-class NewTripPlannerDatabase {
+class TripPlannerDatabase {
   /// Default constructor.
-  NewTripPlannerDatabase();
+  TripPlannerDatabase();
 
   /// The database instance.
-  Database? _database;
+  Future<Database>? _connection;
 
   /// A getter for the database instance.
-  Future<Database> get connection async {
-    if (_database != null) {
-      return _database!;
-    }
-
-    _database = await _initDatabase();
-    return _database!;
-  }
+  Future<Database> get connection => _connection ??= _initDatabase().catchError(
+    (Object error, StackTrace stack) {
+      _connection = null;
+      Error.throwWithStackTrace(error, stack);
+    },
+  );
 
   /// Initializes the database.
   Future<Database> _initDatabase() async {
@@ -32,43 +30,7 @@ class NewTripPlannerDatabase {
     return await openDatabase(
       databasePath,
       version: 1,
-      onCreate: (db, version) async {
-        await UsersTable.createTable(db);
-        await TripsTable.createTable(db);
-        await PersonsTable.createTable(db);
-        await StopsTable.createTable(db);
-        await UserExperiencesTable.createTable(db);
-      },
-    );
-  }
-}
-
-// Creation of DB and Tables
-class TripPlannerDatabase {
-  // Instances of the DB
-  static final TripPlannerDatabase _instance = TripPlannerDatabase._internal();
-
-  factory TripPlannerDatabase() => _instance;
-
-  TripPlannerDatabase._internal();
-
-  static Database? db;
-
-  // DB getter
-  Future<Database> get database async {
-    if (db != null) return db!;
-    db = await _initDatabase();
-    return db!;
-  }
-
-  // Init DB
-  Future<Database> _initDatabase() async {
-    final databaseDirPath = await getDatabasesPath();
-    final databasePath = join(databaseDirPath, 'trip_planner.db');
-
-    return await openDatabase(
-      databasePath,
-      version: 1,
+      onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON'),
       onCreate: (db, version) async {
         await UsersTable.createTable(db);
         await TripsTable.createTable(db);

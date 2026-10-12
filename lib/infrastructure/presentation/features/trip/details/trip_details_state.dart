@@ -3,7 +3,7 @@ import 'package:trip_planner/entities/entity_result.dart';
 import 'package:trip_planner/entities/entity_trip.dart';
 import 'package:trip_planner/infrastructure/infrastructure.dart';
 import 'package:trip_planner/infrastructure/presentation/app_state.dart';
-import 'package:trip_planner/shared/errors/error_app_trip.dart';
+import 'package:trip_planner/shared/errors/error_trip.dart';
 
 /// State for viewing a trip belonging to the current user.
 class TripDetailsState with ChangeNotifier {
@@ -18,7 +18,7 @@ class TripDetailsState with ChangeNotifier {
   final int tripId;
 
   Trip? _trip;
-  AppTripError? _error;
+  TripError? _error;
   bool _loading = true;
   bool _deleting = false;
   bool _disposed = false;
@@ -31,13 +31,13 @@ class TripDetailsState with ChangeNotifier {
   bool get loading => _loading;
 
   /// Whether account ownership is unavailable.
-  bool get signedOut => _appState.appUser == null;
+  bool get signedOut => _appState.user == null;
 
   /// Whether the trip is being deleted.
   bool get deleting => _deleting;
 
   /// The latest loading failure.
-  AppTripError? get error => _error;
+  TripError? get error => _error;
 
   /// Restores the session and reloads the requested trip.
   Future<void> loadTrip() async {
@@ -55,12 +55,12 @@ class TripDetailsState with ChangeNotifier {
 
     switch (session) {
       case Failure():
-        _error = AppTripError.unexpected;
+        _error = TripError.unexpected;
         _trip = null;
       case Success(:final value):
         _trip = null;
         if (value != null) {
-          final result = await appTripUseCase.getTrip(tripId, value.id);
+          final result = await tripUseCase.getTrip(tripId, value.id);
           if (_disposed || request != _request) {
             return;
           }
@@ -79,16 +79,19 @@ class TripDetailsState with ChangeNotifier {
   }
 
   /// Deletes the currently displayed trip.
-  Future<Result<void, AppTripError>> deleteTrip() async {
+  Future<Result<void, TripError>> deleteTrip() async {
     final trip = _trip;
-    final userId = _appState.appUser?.id;
+    final userId = _appState.user?.id;
     if (trip == null || userId == null || trip.userId != userId || _deleting) {
-      return Result.failure(AppTripError.invalidTrip);
+      return Result.failure(TripError.invalidTrip);
     }
 
     _deleting = true;
     notifyListeners();
-    final result = await appTripUseCase.deleteTrip(tripId, userId);
+    final result = await tripUseCase.deleteTrip(tripId, userId);
+    if (result is Success<void, TripError>) {
+      _appState.markTripsChanged();
+    }
     if (!_disposed) {
       _deleting = false;
       notifyListeners();

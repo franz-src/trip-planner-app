@@ -6,19 +6,29 @@ class AppLocalizations {
   AppLocalizations(this.locale);
 
   static AppLocalizations of(BuildContext context) {
-    final localizations = Localizations.of<AppLocalizations>(context, AppLocalizations);
-    
+    final localizations = Localizations.of<AppLocalizations>(
+      context,
+      AppLocalizations,
+    );
+
     if (localizations == null) {
       return AppLocalizations(const Locale('en', 'US'));
     }
-    
+
     return localizations;
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
 
   static final Map<String, Map<String, String>> _localizedValues = {
     'en': {
+      'home': 'Home',
+      'myLocation': 'My location',
+      'locationServicesDisabled':
+          'Enable device location services to locate yourself.',
+      'locationPermissionDenied':
+          'Location permission is required to locate yourself.',
       'destination': 'Destination',
       'latitude': 'Latitude',
       'longitude': 'Longitude',
@@ -38,7 +48,7 @@ class AppLocalizations {
       'login_failed': 'Login Failed',
       'email_password_incorrect': 'Email or password incorrect',
       'try_again': 'Try Again',
-      
+
       // Register Screen
       'create_account': 'Create Your Account',
       'sign_up_subtitle': 'Join us and start planning your trips',
@@ -50,7 +60,7 @@ class AppLocalizations {
       'register_successful': 'Register Successful',
       'can_login_now': 'You can now login with your credentials',
       'go_to_login': 'Go to Login',
-      
+
       // Validation Errors
       'field_required': 'This field is required',
       'name_required': 'Name cannot be blank',
@@ -62,7 +72,7 @@ class AppLocalizations {
       'email_already_registered': "There's already a register with this email",
       'register_error': 'Error during registration',
       'delete_user_error': 'Error deleting user',
-      
+
       // Home Screen
       'plan_your_next_adventure': 'Plan your next adventure',
       'searching': 'Searching...',
@@ -74,15 +84,12 @@ class AppLocalizations {
       'cancel': 'Cancel',
       'select': 'Select',
       'try_different_words': 'Try searching with different words',
-      'recommended_trips': 'Recommended Trips',
       'welcome': 'Welcome, {0}',
       'search_destinations': 'Search destinations...',
       'no_results_found': 'No results found',
       'selected': 'Selected: {0}',
       'days': '{0} days',
-      'brazilian_northeast': 'Brazilian Northeast',
-      'southern_brazil': 'Southern Brazil',
-      
+
       // Trip Register Screen
       'new_trip': 'New Trip',
       'trip_data': 'Trip Data',
@@ -104,7 +111,7 @@ class AppLocalizations {
       'trip_created_successfully': 'Trip created successfully!',
       'error': 'Error',
       'ok': 'Ok',
-      
+
       // Trip Validations
       'trip_title_required': 'Trip title is required.',
       'group_empty': 'Please add at least one person to the group.',
@@ -130,13 +137,14 @@ class AppLocalizations {
       'delete': 'Delete',
       'addStop': 'Add Stop',
       'deleteStop': 'Delete Stop',
-      'deleteStopConfirm': 'Are you sure you want to delete this stop? This action cannot be undone.',
+      'deleteStopConfirm':
+          'Are you sure you want to delete this stop? This action cannot be undone.',
       'errorAddStopTitle': 'Error in Add Stop',
       'errorAddStopMsg': 'You need to have, at least, one experience.',
       'dates': 'Dates',
       'experiences': 'Experiences',
       'unknownPlace': 'Unknown Place',
-      
+
       // List Trips
       'yourTrips': 'Your Trips',
       'activeTrips': 'Active Trips',
@@ -162,7 +170,8 @@ class AppLocalizations {
       'deletingTrip': 'Deleting trip...',
       'tripDeletedSuccess': 'Trip deleted successfully!',
       'tripBooklet': 'Trip Booklet',
-      'tripBookletQuestion': 'Would you like to create a booklet for this trip?',
+      'tripBookletQuestion':
+          'Would you like to create a booklet for this trip?',
       'create': 'Create',
       'concluded': 'Concluded',
       'tripDetails': 'Trip Details',
@@ -177,7 +186,8 @@ class AppLocalizations {
       'nature': 'Nature',
 
       'pleaseAddAllPersonPhotos': 'Please add photos for all group members',
-      'pleaseAddAllStopData': 'Please add photos and descriptions for all stops',
+      'pleaseAddAllStopData':
+          'Please add photos and descriptions for all stops',
       'generatingPdf': 'Generating PDF...',
       'tripRoute': 'Trip Route',
       'mapNotAvailable': 'Map not available',
@@ -202,7 +212,7 @@ class AppLocalizations {
       'successGeneratingPdf': 'PDF booklet successfully generated!',
       'creatingPdf': 'Creating booklet...',
       'noPhotos': 'No photos added',
-      
+
       'preferences': 'Preferences',
       'dark_mode': 'Dark Mode',
       'language': 'Language',
@@ -215,12 +225,19 @@ class AppLocalizations {
       'information_updated': 'Information updated successfully!',
       'delete_account': 'Delete Account',
       'delete_account_confirm': 'Delete',
-      'delete_account_question': 'Are you sure you want to delete your account? This action cannot be undone.',
+      'delete_account_question':
+          'Are you sure you want to delete your account? This action cannot be undone.',
       'log_out': 'Log Out',
       'log_out_confirm': 'Confirm',
       'log_out_question': 'Are you sure you want to log out?',
     },
     'pt': {
+      'home': 'Início',
+      'myLocation': 'Minha localização',
+      'locationServicesDisabled':
+          'Ative os serviços de localização do dispositivo.',
+      'locationPermissionDenied':
+          'Permita o acesso à localização para localizar você.',
       'destination': 'Destino',
       'latitude': 'Latitude',
       'longitude': 'Longitude',
@@ -240,7 +257,7 @@ class AppLocalizations {
       'login_failed': 'Falha no Login',
       'email_password_incorrect': 'E-mail ou senha incorretos',
       'try_again': 'Tentar Novamente',
-      
+
       // Register Screen
       'create_account': 'Crie Sua Conta',
       'sign_up_subtitle': 'Junte-se a nós e comece a planejar suas viagens',
@@ -252,7 +269,7 @@ class AppLocalizations {
       'register_successful': 'Cadastro Realizado',
       'can_login_now': 'Agora você pode fazer login com suas credenciais',
       'go_to_login': 'Ir para Login',
-      
+
       // Validation Errors
       'field_required': 'Este campo é obrigatório',
       'name_required': 'Nome não pode estar em branco',
@@ -264,7 +281,7 @@ class AppLocalizations {
       'email_already_registered': 'Já existe um cadastro com este e-mail',
       'register_error': 'Erro ao realizar cadastro',
       'delete_user_error': 'Erro ao deletar usuário',
-      
+
       // Home Screen
       'plan_your_next_adventure': 'Planeje sua próxima aventura',
       'searching': 'Buscando...',
@@ -276,15 +293,12 @@ class AppLocalizations {
       'cancel': 'Cancelar',
       'select': 'Selecionar',
       'try_different_words': 'Tente buscar com outras palavras',
-      'recommended_trips': 'Viagens Recomendadas',
       'welcome': 'Bem-vindo, {0}',
       'search_destinations': 'Buscar destinos...',
       'no_results_found': 'Nenhum resultado encontrado',
       'selected': 'Selecionado: {0}',
       'days': '{0} dias',
-      'brazilian_northeast': 'Nordeste Brasileiro',
-      'southern_brazil': 'Sul do Brasil',
-      
+
       'new_trip': 'Nova Viagem',
       'trip_data': 'Dados da Viagem',
       'trip_title': 'Título da Viagem',
@@ -305,7 +319,7 @@ class AppLocalizations {
       'trip_created_successfully': 'Viagem criada com sucesso!',
       'error': 'Erro',
       'ok': 'Ok',
-      
+
       // Trip Validations
       'trip_title_required': 'O título da viagem é obrigatório.',
       'group_empty': 'Adicione pelo menos uma pessoa ao grupo.',
@@ -314,7 +328,8 @@ class AppLocalizations {
       'age_invalid': 'A idade deve ser um número válido.',
       'start_date_required': 'A data de início é obrigatória.',
       'end_date_required': 'A data de término é obrigatória.',
-      'end_date_error': 'A data de término não pode ser anterior à data de início.',
+      'end_date_error':
+          'A data de término não pode ser anterior à data de início.',
 
       'selectDates': 'Selecionar Datas',
       'startDate': 'Data de Início',
@@ -330,13 +345,15 @@ class AppLocalizations {
       'delete': 'Excluir',
       'addStop': 'Adicionar Parada',
       'deleteStop': 'Excluir Parada',
-      'deleteStopConfirm': 'Tem certeza de que deseja excluir esta parada? Essa ação não pode ser desfeita.',
+      'deleteStopConfirm':
+          'Tem certeza de que deseja excluir esta parada? Essa ação não pode ser desfeita.',
       'errorAddStopTitle': 'Erro ao Adicionar Parada',
-      'errorAddStopMsg': 'Você precisa ter pelo menos uma experiência selecionada.',
+      'errorAddStopMsg':
+          'Você precisa ter pelo menos uma experiência selecionada.',
       'dates': 'Datas',
       'experiences': 'Experiências',
       'unknownPlace': 'Local Desconhecido',
-      
+
       // List Trips
       'yourTrips': 'Suas Viagens',
       'activeTrips': 'Viagens Ativas',
@@ -376,8 +393,10 @@ class AppLocalizations {
       'local': 'Local',
       'nature': 'Natureza',
 
-      'pleaseAddAllPersonPhotos': 'Adicione fotos para todos os membros do grupo',
-      'pleaseAddAllStopData': 'Adicione fotos e descrições para todas as paradas',
+      'pleaseAddAllPersonPhotos':
+          'Adicione fotos para todos os membros do grupo',
+      'pleaseAddAllStopData':
+          'Adicione fotos e descrições para todas as paradas',
       'generatingPdf': 'Gerando PDF...',
       'tripRoute': 'Rota da Viagem',
       'mapNotAvailable': 'Mapa não disponível',
@@ -402,7 +421,7 @@ class AppLocalizations {
       'successGeneratingPdf': 'Caderneta gerada com sucesso!',
       'creatingPdf': 'Criando caderneta...',
       'noPhotos': 'Nenhuma foto adicionada',
-      
+
       // Config Screen
       'preferences': 'Preferências',
       'dark_mode': 'Modo Escuro',
@@ -416,12 +435,19 @@ class AppLocalizations {
       'information_updated': 'Informações atualizadas com sucesso!',
       'delete_account': 'Excluir Conta',
       'delete_account_confirm': 'Excluir',
-      'delete_account_question': 'Tem certeza de que deseja excluir sua conta? Esta ação não pode ser desfeita.',
+      'delete_account_question':
+          'Tem certeza de que deseja excluir sua conta? Esta ação não pode ser desfeita.',
       'log_out': 'Sair',
       'log_out_confirm': 'Confirmar',
       'log_out_question': 'Tem certeza de que deseja sair?',
     },
     'es': {
+      'home': 'Inicio',
+      'myLocation': 'Mi ubicación',
+      'locationServicesDisabled':
+          'Activa los servicios de ubicación del dispositivo.',
+      'locationPermissionDenied':
+          'Permite el acceso a la ubicación para localizarte.',
       'destination': 'Destino',
       'latitude': 'Latitud',
       'longitude': 'Longitud',
@@ -441,19 +467,20 @@ class AppLocalizations {
       'login_failed': 'Error de Inicio de Sesión',
       'email_password_incorrect': 'Correo o contraseña incorrectos',
       'try_again': 'Intentar de Nuevo',
-      
+
       // Register Screen
       'create_account': 'Crea Tu Cuenta',
       'sign_up_subtitle': 'Únete a nosotros y comienza a planificar tus viajes',
       'name': 'Nombre',
       'sign_up': 'Registrarse',
-      'have_account': '¿Ya tienes una cuenta? ¡Haz clic aquí para iniciar sesión!',
+      'have_account':
+          '¿Ya tienes una cuenta? ¡Haz clic aquí para iniciar sesión!',
       'have_account_question': '¿Ya tienes una cuenta? ',
       'sign_in_link': 'Inicia Sesión',
       'register_successful': 'Registro Exitoso',
       'can_login_now': 'Ahora puedes iniciar sesión con tus credenciales',
       'go_to_login': 'Ir al Inicio de Sesión',
-      
+
       // Validation Errors
       'field_required': 'Este campo es obligatorio',
       'name_required': 'El nombre no puede estar en blanco',
@@ -465,7 +492,7 @@ class AppLocalizations {
       'email_already_registered': 'Ya existe un registro con este correo',
       'register_error': 'Error al realizar el registro',
       'delete_user_error': 'Error al eliminar usuario',
-      
+
       // Home Screen
       'plan_your_next_adventure': 'Planifica tu próxima aventura',
       'searching': 'Buscando...',
@@ -477,15 +504,12 @@ class AppLocalizations {
       'cancel': 'Cancelar',
       'select': 'Seleccionar',
       'try_different_words': 'Intenta buscar con otras palabras',
-      'recommended_trips': 'Viajes Recomendados',
       'welcome': 'Bienvenido, {0}',
       'search_destinations': 'Buscar destinos...',
       'no_results_found': 'No se encontraron resultados',
       'selected': 'Seleccionado: {0}',
       'days': '{0} días',
-      'brazilian_northeast': 'Nordeste Brasileño',
-      'southern_brazil': 'Sur de Brasil',
-      
+
       // Trip Register Screen
       'new_trip': 'Nuevo Viaje',
       'trip_data': 'Datos del Viaje',
@@ -507,7 +531,7 @@ class AppLocalizations {
       'trip_created_successfully': '¡Viaje creado con éxito!',
       'error': 'Error',
       'ok': 'Ok',
-      
+
       // Trip Validations
       'trip_title_required': 'El título del viaje es obligatorio.',
       'group_empty': 'Agrega al menos una persona al grupo.',
@@ -516,7 +540,8 @@ class AppLocalizations {
       'age_invalid': 'La edad debe ser un número válido.',
       'start_date_required': 'La fecha de inicio es obligatoria.',
       'end_date_required': 'La fecha de finalización es obligatoria.',
-      'end_date_error': 'La fecha de finalización no puede ser anterior a la fecha de inicio.',
+      'end_date_error':
+          'La fecha de finalización no puede ser anterior a la fecha de inicio.',
 
       'selectDates': 'Seleccionar Fechas',
       'startDate': 'Fecha de Inicio',
@@ -532,13 +557,14 @@ class AppLocalizations {
       'delete': 'Eliminar',
       'addStop': 'Agregar Parada',
       'deleteStop': 'Eliminar Parada',
-      'deleteStopConfirm': '¿Estás seguro de que deseas eliminar esta parada? Esta acción no se puede deshacer.',
+      'deleteStopConfirm':
+          '¿Estás seguro de que deseas eliminar esta parada? Esta acción no se puede deshacer.',
       'errorAddStopTitle': 'Error al Agregar Parada',
       'errorAddStopMsg': 'Debes tener al menos una experiencia seleccionada.',
       'dates': 'Fechas',
       'experiences': 'Experiencias',
       'unknownPlace': 'Lugar Desconocido',
-      
+
       // List Trips
       'yourTrips': 'Tus Viajes',
       'activeTrips': 'Viajes Activos',
@@ -578,8 +604,10 @@ class AppLocalizations {
       'local': 'Local',
       'nature': 'Naturaleza',
 
-      'pleaseAddAllPersonPhotos': 'Agrega fotos para todos los miembros del grupo',
-      'pleaseAddAllStopData': 'Agrega fotos y descripciones para todas las paradas',
+      'pleaseAddAllPersonPhotos':
+          'Agrega fotos para todos los miembros del grupo',
+      'pleaseAddAllStopData':
+          'Agrega fotos y descripciones para todas las paradas',
       'generatingPdf': 'Generando PDF...',
       'tripRoute': 'Ruta del Viaje',
       'mapNotAvailable': 'Mapa no disponible',
@@ -604,7 +632,7 @@ class AppLocalizations {
       'successGeneratingPdf': '¡Libreta generada con éxito!',
       'creatingPdf': 'Creando libreta...',
       'noPhotos': 'No se agregaron fotos',
-      
+
       'preferences': 'Preferencias',
       'dark_mode': 'Modo Oscuro',
       'language': 'Idioma',
@@ -617,7 +645,8 @@ class AppLocalizations {
       'information_updated': '¡Información actualizada con éxito!',
       'delete_account': 'Eliminar Cuenta',
       'delete_account_confirm': 'Eliminar',
-      'delete_account_question': '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.',
+      'delete_account_question':
+          '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.',
       'log_out': 'Cerrar Sesión',
       'log_out_confirm': 'Confirmar',
       'log_out_question': '¿Estás seguro de que deseas cerrar sesión?',
@@ -626,13 +655,13 @@ class AppLocalizations {
 
   String translate(String key, [List<String>? args]) {
     String translation = _localizedValues[locale.languageCode]?[key] ?? key;
-    
+
     if (args != null) {
       for (int i = 0; i < args.length; i++) {
         translation = translation.replaceAll('{$i}', args[i]);
       }
     }
-    
+
     return translation;
   }
 
@@ -652,7 +681,7 @@ class AppLocalizations {
   String get loginFailed => translate('login_failed');
   String get emailPasswordIncorrect => translate('email_password_incorrect');
   String get tryAgain => translate('try_again');
-  
+
   // Getters for Register Screen
   String get createAccount => translate('create_account');
   String get signUpSubtitle => translate('sign_up_subtitle');
@@ -664,7 +693,7 @@ class AppLocalizations {
   String get registerSuccessful => translate('register_successful');
   String get canLoginNow => translate('can_login_now');
   String get goToLogin => translate('go_to_login');
-  
+
   // Getters for Validation Errors
   String get fieldRequired => translate('field_required');
   String get nameRequired => translate('name_required');
@@ -675,10 +704,11 @@ class AppLocalizations {
   String get passwordTooLong {
     return translate('password_too_long');
   }
+
   String get emailAlreadyRegistered => translate('email_already_registered');
   String get registerError => translate('register_error');
   String get deleteUserError => translate('delete_user_error');
-  
+
   // Home Screen
   String welcome(String name) => translate('welcome', [name]);
   String get planYourNextAdventure => translate('plan_your_next_adventure');
@@ -687,6 +717,11 @@ class AppLocalizations {
   String get searchResults => translate('search_results');
   String found(String count) => translate('found', [count]);
   String get locationSelected => translate('location_selected');
+
+  String get home => translate('home');
+  String get myLocation => translate('myLocation');
+  String get locationServicesDisabled => translate('locationServicesDisabled');
+  String get locationPermissionDenied => translate('locationPermissionDenied');
 
   String get destination => translate('destination');
   String get latitude => translate('latitude');
@@ -697,12 +732,9 @@ class AppLocalizations {
   String get select => translate('select');
   String get noResultsFound => translate('no_results_found');
   String get tryDifferentWords => translate('try_different_words');
-  String get recommendedTrips => translate('recommended_trips');
   String selected(String name) => translate('selected', [name]);
   String days(String count) => translate('days', [count]);
-  String get brazilianNortheast => translate('brazilian_northeast');
-  String get southernBrazil => translate('southern_brazil');
-  
+
   // Getters for Trip Register Screen
   String get newTrip => translate('new_trip');
   String get tripData => translate('trip_data');
@@ -724,7 +756,7 @@ class AppLocalizations {
   String get tripCreatedSuccessfully => translate('trip_created_successfully');
   String get error => translate('error');
   String get ok => translate('ok');
-  
+
   String get tripTitleRequired => translate('trip_title_required');
   String get groupEmpty => translate('group_empty');
   String get stopsEmpty => translate('stops_empty');
@@ -739,8 +771,10 @@ class AppLocalizations {
   String get startDate => translate('startDate');
   String get endDate => translate('endDate');
   String get selectExperiences => translate('selectExperiences');
-  String get immersionDifferentCulture => translate('immersionDifferentCulture');
-  String get exploreAlternativeCuisines => translate('exploreAlternativeCuisines');
+  String get immersionDifferentCulture =>
+      translate('immersionDifferentCulture');
+  String get exploreAlternativeCuisines =>
+      translate('exploreAlternativeCuisines');
   String get visitHistoricalSites => translate('visitHistoricalSites');
   String get visitLocalEstablishments => translate('visitLocalEstablishments');
   String get contactWithNature => translate('contactWithNature');
@@ -755,7 +789,7 @@ class AppLocalizations {
   String get dates => translate('dates');
   String get experiences => translate('experiences');
   String get unknownPlace => translate('unknownPlace');
-  
+
   // Getters for List Trips Screen
   String get yourTrips => translate('yourTrips');
   String get activeTrips => translate('activeTrips');
@@ -767,13 +801,14 @@ class AppLocalizations {
   String get ended => translate('ended');
   String get markAsConcluded => translate('markAsConcluded');
   String get concludeTrip => translate('concludeTrip');
-  String tripEndedOn(String title, String date) =>
-      translate('tripEndedOn').replaceAll('{title}', title).replaceAll('{date}', date);
+  String tripEndedOn(String title, String date) => translate(
+    'tripEndedOn',
+  ).replaceAll('{title}', title).replaceAll('{date}', date);
   String get confirmConclude => translate('confirmConclude');
   String get notNow => translate('notNow');
   String get tripConcludedSuccess => translate('tripConcludedSuccess');
   String get tripConcludedError => translate('tripConcludedError');
-  
+
   String get deleteTrip => translate('deleteTrip');
   String deleteTripConfirm(String title) =>
       translate('deleteTripConfirm', [title]);
@@ -841,7 +876,8 @@ class AppLocalizations {
   String get logOutQuestion => translate('log_out_question');
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override

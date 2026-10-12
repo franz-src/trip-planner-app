@@ -3,13 +3,15 @@ import 'package:trip_planner/entities/entity_result.dart';
 import 'package:trip_planner/entities/entity_trip.dart';
 import 'package:trip_planner/infrastructure/infrastructure.dart';
 import 'package:trip_planner/infrastructure/presentation/app_state.dart';
-import 'package:trip_planner/shared/errors/error_app_trip.dart';
-import 'package:trip_planner/shared/validations/validation_app_stop.dart';
+import 'package:trip_planner/shared/errors/error_trip.dart';
+import 'package:trip_planner/shared/validations/validation_stop.dart';
 
 /// State for the current user's trip list.
 class TripListState with ChangeNotifier {
   /// Default constructor.
   TripListState(this._appState) {
+    _tripRevision = _appState.tripRevision;
+    _appState.addListener(_onTripsChanged);
     loadTrips();
   }
 
@@ -17,10 +19,18 @@ class TripListState with ChangeNotifier {
   List<Trip> _trips = [];
   bool _loading = true;
   bool _disposed = false;
-  AppTripError? _error;
+  TripError? _error;
   int _request = 0;
   int? _userId;
+  int _tripRevision = 0;
   final Set<int> _busyTrips = {};
+
+  void _onTripsChanged() {
+    if (!_disposed && _tripRevision != _appState.tripRevision) {
+      _tripRevision = _appState.tripRevision;
+      loadTrips();
+    }
+  }
 
   /// Trips belonging to the current user.
   List<Trip> get trips => List.unmodifiable(_trips);
@@ -29,17 +39,17 @@ class TripListState with ChangeNotifier {
   bool get loading => _loading;
 
   /// The latest trip-list failure.
-  AppTripError? get error => _error;
+  TripError? get error => _error;
 
   /// Whether a session is available for the list.
-  bool get signedOut => _appState.appUser == null;
+  bool get signedOut => _appState.user == null;
 
   /// Whether an action is in progress for a trip.
   bool isBusy(Trip trip) => _busyTrips.contains(trip.id);
 
   /// Whether a trip ended before today.
   bool isExpired(Trip trip) {
-    final end = AppStopRules.parseDate(trip.endDate);
+    final end = StopRules.parseDate(trip.endDate);
     if (end == null) {
       return false;
     }
@@ -65,13 +75,13 @@ class TripListState with ChangeNotifier {
     switch (session) {
       case Failure():
         _trips = [];
-        _error = AppTripError.unexpected;
+        _error = TripError.unexpected;
       case Success(:final value):
         _userId = value?.id;
         if (value == null) {
           _trips = [];
         } else {
-          final result = await appTripUseCase.getAllTrips(value.id);
+          final result = await tripUseCase.getAllTrips(value.id);
           if (_disposed || request != _request) {
             return;
           }
@@ -90,24 +100,23 @@ class TripListState with ChangeNotifier {
   }
 
   /// Marks an expired trip as concluded.
-  Future<Result<void, AppTripError>> concludeTrip(Trip trip) async {
+  Future<Result<void, TripError>> concludeTrip(Trip trip) async {
     final id = trip.id;
     if (id == null ||
         !isExpired(trip) ||
         trip.concluded ||
         isBusy(trip) ||
-        _appState.appUser?.id != _userId) {
-      return Result.failure(AppTripError.invalidTrip);
+        _appState.user?.id != _userId) {
+      return Result.failure(TripError.invalidTrip);
     }
 
     _busyTrips.add(id);
     notifyListeners();
-    final result = await appTripUseCase.updateTrip(
-      trip.copyWith(concluded: true),
-    );
+    final result = await tripUseCase.updateTrip(trip.copyWith(concluded: true));
     if (!_disposed) {
       _busyTrips.remove(id);
-      if (result is Success<void, AppTripError>) {
+      if (result is Success<void, TripError>) {
+        _appState.markTripsChanged();
         _trips = _trips.map((value) {
           if (value.id == id) {
             return value.copyWith(concluded: true);
@@ -124,22 +133,23 @@ class TripListState with ChangeNotifier {
   }
 
   /// Deletes a trip belonging to the current user.
-  Future<Result<void, AppTripError>> deleteTrip(Trip trip) async {
+  Future<Result<void, TripError>> deleteTrip(Trip trip) async {
     final id = trip.id;
     final userId = _userId;
     if (id == null ||
         userId == null ||
         isBusy(trip) ||
-        _appState.appUser?.id != userId) {
-      return Result.failure(AppTripError.invalidTrip);
+        _appState.user?.id != userId) {
+      return Result.failure(TripError.invalidTrip);
     }
 
     _busyTrips.add(id);
     notifyListeners();
-    final result = await appTripUseCase.deleteTrip(id, userId);
+    final result = await tripUseCase.deleteTrip(id, userId);
     if (!_disposed) {
       _busyTrips.remove(id);
-      if (result is Success<void, AppTripError>) {
+      if (result is Success<void, TripError>) {
+        _appState.markTripsChanged();
         _trips.removeWhere((value) => value.id == id);
       }
 
@@ -152,6 +162,7 @@ class TripListState with ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    _appState.removeListener(_onTripsChanged);
     super.dispose();
   }
 }

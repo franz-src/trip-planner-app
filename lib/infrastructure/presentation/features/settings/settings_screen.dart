@@ -262,7 +262,7 @@ class _SettingsScreen extends StatelessWidget {
                     Text(error.translate(intl)),
                   if (!state.loading &&
                       state.error == null &&
-                      appState.appUser != null) ...[
+                      appState.user != null) ...[
                     Row(
                       children: [
                         Icon(

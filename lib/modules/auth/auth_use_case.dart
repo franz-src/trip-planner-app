@@ -19,7 +19,7 @@ class _AuthUseCase implements AuthUseCase {
   }
 
   @override
-  Future<Result<AppUser, AuthError>> attemptLogin(
+  Future<Result<User, AuthError>> attemptLogin(
     UserCredentials credentials,
   ) async {
     final error = AuthRules.validateLogin(credentials);

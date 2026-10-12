@@ -3,7 +3,7 @@ import 'package:trip_planner/entities/entity_result.dart';
 import 'package:trip_planner/entities/entity_settings.dart';
 import 'package:trip_planner/entities/entity_user.dart';
 import 'package:trip_planner/infrastructure/presentation/app_state.dart';
-import 'package:trip_planner/shared/errors/error_app_user.dart';
+import 'package:trip_planner/shared/errors/error_user.dart';
 import 'package:trip_planner/shared/errors/error_auth.dart';
 import 'package:trip_planner/shared/errors/error_settings.dart';
 
@@ -26,7 +26,7 @@ class SettingsState with ChangeNotifier {
   bool _showInformation = false;
   bool _loading = true;
   bool _disposed = false;
-  AppUserError? _error;
+  UserError? _error;
 
   /// Whether language choices are visible.
   bool get showLanguage => _showLanguage;
@@ -38,7 +38,7 @@ class SettingsState with ChangeNotifier {
   bool get loading => _loading;
 
   /// A failure encountered while restoring the current profile.
-  AppUserError? get error => _error;
+  UserError? get error => _error;
 
   Future<void> _loadUser() async {
     final result = await _appState.refreshUser();
@@ -86,13 +86,13 @@ class SettingsState with ChangeNotifier {
   }
 
   /// Saves the edited name and email without changing the password.
-  Future<Result<AppUser, AppUserError>> updateUser() async {
-    final currentUser = _appState.appUser;
+  Future<Result<User, UserError>> updateUser() async {
+    final currentUser = _appState.user;
     if (currentUser == null) {
-      return Result.failure(AppUserError.unexpected);
+      return Result.failure(UserError.unexpected);
     }
 
-    final user = AppUser(
+    final user = User(
       id: currentUser.id,
       name: controllerName.text,
       email: controllerEmail.text,
@@ -102,7 +102,7 @@ class SettingsState with ChangeNotifier {
   }
 
   /// Deletes the current account through the application user module.
-  Future<Result<void, AppUserError>> deleteUser() async {
+  Future<Result<void, UserError>> deleteUser() async {
     return await _appState.deleteUser();
   }
 

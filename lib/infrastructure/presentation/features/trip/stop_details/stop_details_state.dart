@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:trip_planner/entities/entity_stop.dart';
 import 'package:trip_planner/infrastructure/presentation/app_state.dart';
 import 'package:trip_planner/infrastructure/presentation/features/trip/details/trip_details_state.dart';
-import 'package:trip_planner/shared/errors/error_app_trip.dart';
+import 'package:trip_planner/shared/errors/error_trip.dart';
 
 /// State for viewing a stop within the current user's trip.
 class StopDetailsState with ChangeNotifier {
@@ -35,13 +35,13 @@ class StopDetailsState with ChangeNotifier {
   }
 
   /// The latest loading failure.
-  AppTripError? get error {
+  TripError? get error {
     if (_details.error != null) {
       return _details.error;
     }
 
     if (!loading && !signedOut && stop == null) {
-      return AppTripError.notFound;
+      return TripError.notFound;
     }
 
     return null;

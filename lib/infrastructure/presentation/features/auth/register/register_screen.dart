@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:trip_planner/entities/entity_result.dart';
 import 'package:trip_planner/infrastructure/presentation/app/components/button_component.dart';
 import 'package:trip_planner/infrastructure/presentation/app/components/text_field_component.dart';
 import 'package:trip_planner/infrastructure/presentation/app/components/trip_planner_logo_component.dart';
@@ -27,6 +28,8 @@ class _RegisterScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final intl = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final from = GoRouterState.of(context).uri.queryParameters['from'];
+    final parameters = <String, String>{if (from != null) 'from': from};
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -34,7 +37,9 @@ class _RegisterScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: theme.colorScheme.primary),
-          onPressed: () => context.go(AppRoutes.login),
+          onPressed: () => context.go(
+            Uri(path: AppRoutes.login, queryParameters: parameters).toString(),
+          ),
         ),
       ),
       body: Center(
@@ -81,23 +86,63 @@ class _RegisterScreen extends StatelessWidget {
                         Consumer<RegisterState>(
                           builder: (context, state, child) => Column(
                             children: [
-                              TextFieldComponent(
-                                controller: state.controllerName,
-                                label: intl.name,
+                              AbsorbPointer(
+                                absorbing: state.loading,
+                                child: Column(
+                                  children: [
+                                    TextFieldComponent(
+                                      controller: state.controllerName,
+                                      label: intl.name,
+                                    ),
+                                    TextFieldComponent(
+                                      controller: state.controllerEmail,
+                                      label: intl.email,
+                                    ),
+                                    TextFieldComponent(
+                                      controller: state.controllerPassword,
+                                      label: intl.password,
+                                      isPassword: true,
+                                    ),
+                                    ButtonComponent(
+                                      function: () async {
+                                        final result = await state
+                                            .attemptRegister();
+                                        if (!context.mounted) {
+                                          return;
+                                        }
+
+                                        if (result case Success()) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                intl.registerSuccessful,
+                                              ),
+                                            ),
+                                          );
+                                          context.go(
+                                            Uri(
+                                              path: AppRoutes.login,
+                                              queryParameters: parameters,
+                                            ).toString(),
+                                          );
+                                        }
+                                      },
+                                      message: intl.signUp,
+                                    ),
+                                  ],
+                                ),
                               ),
-                              TextFieldComponent(
-                                controller: state.controllerEmail,
-                                label: intl.email,
-                              ),
-                              TextFieldComponent(
-                                controller: state.controllerPassword,
-                                label: intl.password,
-                                isPassword: true,
-                              ),
-                              ButtonComponent(
-                                function: () => state.attemptRegister(),
-                                message: intl.signUp,
-                              ),
+                              if (state.loading)
+                                const LinearProgressIndicator(),
+                              if (state.error case final error?)
+                                Text(
+                                  error.translate(intl),
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.error,
+                                  ),
+                                ),
                             ],
                           ),
                         ),
@@ -132,7 +177,12 @@ class _RegisterScreen extends StatelessWidget {
                               ),
                             ),
                             GestureDetector(
-                              onTap: () => context.go(AppRoutes.login),
+                              onTap: () => context.go(
+                                Uri(
+                                  path: AppRoutes.login,
+                                  queryParameters: parameters,
+                                ).toString(),
+                              ),
                               child: Text(
                                 intl.signInLink,
                                 style: TextStyle(

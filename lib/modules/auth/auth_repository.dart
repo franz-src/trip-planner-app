@@ -10,7 +10,7 @@ import 'package:trip_planner/infrastructure/database/database.dart';
 import 'package:trip_planner/modules/auth/auth_spec.dart';
 
 AuthRepository newAuthRepository(
-  NewTripPlannerDatabase database,
+  TripPlannerDatabase database,
   FlutterSecureStorage storage,
 ) {
   return _AuthRepository(database, storage);
@@ -19,13 +19,13 @@ AuthRepository newAuthRepository(
 class _AuthRepository implements AuthRepository {
   const _AuthRepository(this._database, this._storage);
 
-  final NewTripPlannerDatabase _database;
+  final TripPlannerDatabase _database;
   final FlutterSecureStorage _storage;
 
   @override
   Future<Result<void, AuthError>> logout() async {
     try {
-      await _storage.delete(key: StorageKeys.appUserStorageKey);
+      await _storage.delete(key: StorageKeys.userStorageKey);
 
       return Result.success(null);
     } catch (e) {
@@ -34,7 +34,7 @@ class _AuthRepository implements AuthRepository {
   }
 
   @override
-  Future<Result<AppUser, AuthError>> attemptLogin(
+  Future<Result<User, AuthError>> attemptLogin(
     UserCredentials credentials,
   ) async {
     try {
@@ -58,9 +58,9 @@ class _AuthRepository implements AuthRepository {
         return Result.failure(AuthError.invalidCredentials);
       }
 
-      final user = AppUser.fromJSON(users.first);
+      final user = User.fromJSON(users.first);
       await _storage.write(
-        key: StorageKeys.appUserStorageKey,
+        key: StorageKeys.userStorageKey,
         value: jsonEncode(user.toJSON()),
       );
 
@@ -92,7 +92,7 @@ class _AuthRepository implements AuthRepository {
   }
 
   @override
-  Future<Result<AppUser?, AuthError>> getUserByEmail(String email) async {
+  Future<Result<User?, AuthError>> getUserByEmail(String email) async {
     try {
       final conn = await _database.connection;
 
@@ -106,7 +106,7 @@ class _AuthRepository implements AuthRepository {
         return Result.success(null);
       }
 
-      return Result.success(AppUser.fromJSON(users.first));
+      return Result.success(User.fromJSON(users.first));
     } catch (e) {
       return Result.failure(AuthError.unexpected);
     }

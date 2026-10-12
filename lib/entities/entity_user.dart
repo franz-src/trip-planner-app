@@ -36,9 +36,9 @@ final class UserCredentials {
 
 /// Represents the application user.
 @immutable
-final class AppUser {
+final class User {
   /// Default constructor.
-  const AppUser({required this.id, required this.name, required this.email});
+  const User({required this.id, required this.name, required this.email});
 
   /// Database identifier of the user.
   final int id;
@@ -49,12 +49,8 @@ final class AppUser {
   /// Email address of the user.
   final String email;
 
-  factory AppUser.fromJSON(Map<String, dynamic> json) {
-    return AppUser(
-      id: json['id'],
-      name: json['name'],
-      email: json['email'],
-    );
+  factory User.fromJSON(Map<String, dynamic> json) {
+    return User(id: json['id'], name: json['name'], email: json['email']);
   }
 
   /// Returns user information suitable for session storage.
