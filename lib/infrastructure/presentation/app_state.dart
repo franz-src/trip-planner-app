@@ -1,6 +1,8 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:ui' show PlatformDispatcher;
+
 import 'package:flutter/material.dart';
 import 'package:trip_planner/entities/entity_result.dart';
+import 'package:trip_planner/entities/entity_settings.dart';
 import 'package:trip_planner/entities/entity_user.dart';
 import 'package:trip_planner/infrastructure/infrastructure.dart';
 
@@ -12,8 +14,10 @@ class AppState with ChangeNotifier {
   }
 
   AppUser? _appUser;
-  var _themeMode = ThemeMode.system;
-  var _locale = Locale('EN');
+  var _themeMode = AppTheme.system.toThemeMode();
+  var _locale = AppLanguage.fromLocales(
+    PlatformDispatcher.instance.locales,
+  ).toLocale();
   var _loading = false;
 
   /// Represents the current application user.
@@ -39,8 +43,17 @@ class AppState with ChangeNotifier {
       Failure() => null,
     };
 
-    _themeMode = await settingsUseCase.getTheme();
-    _locale = await settingsUseCase.getLanguage();
+    final themeResult = await settingsUseCase.getTheme();
+    _themeMode = switch (themeResult) {
+      Success(:final value) => value.toThemeMode(),
+      Failure() => AppTheme.system.toThemeMode(),
+    };
+
+    final languageResult = await settingsUseCase.getLanguage();
+    _locale = switch (languageResult) {
+      Success(:final value) => value.toLocale(),
+      Failure() => _locale,
+    };
 
     _loading = false;
     notifyListeners();
