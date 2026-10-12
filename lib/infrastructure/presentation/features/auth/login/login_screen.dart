@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:trip_planner/entities/entity_result.dart';
 import 'package:trip_planner/infrastructure/presentation/app/components/button_component.dart';
 import 'package:trip_planner/infrastructure/presentation/app/components/text_field_component.dart';
 import 'package:trip_planner/infrastructure/presentation/app/components/trip_planner_logo_component.dart';
@@ -84,7 +85,16 @@ class _LoginScreen extends StatelessWidget {
                                 isPassword: true,
                               ),
                               ButtonComponent(
-                                function: () => state.attemptLogin(),
+                                function: () async {
+                                  final result = await state.attemptLogin();
+                                  if (!context.mounted) {
+                                    return;
+                                  }
+
+                                  if (result case Success()) {
+                                    context.go(AppRoutes.trips);
+                                  }
+                                },
                                 message: intl.signIn,
                               ),
                             ],

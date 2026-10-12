@@ -19,6 +19,9 @@ class AppLocalizations {
 
   static final Map<String, Map<String, String>> _localizedValues = {
     'en': {
+      'destination': 'Destination',
+      'latitude': 'Latitude',
+      'longitude': 'Longitude',
       // Login Screen
       'welcome_back': 'Welcome Back!',
       'sign_in_subtitle': 'Sign in to continue your journey',
@@ -218,6 +221,9 @@ class AppLocalizations {
       'log_out_question': 'Are you sure you want to log out?',
     },
     'pt': {
+      'destination': 'Destino',
+      'latitude': 'Latitude',
+      'longitude': 'Longitude',
       // Login Screen
       'welcome_back': 'Bem-vindo de Volta!',
       'sign_in_subtitle': 'Entre para continuar sua jornada',
@@ -416,6 +422,9 @@ class AppLocalizations {
       'log_out_question': 'Tem certeza de que deseja sair?',
     },
     'es': {
+      'destination': 'Destino',
+      'latitude': 'Latitud',
+      'longitude': 'Longitud',
       // Login Screen
       'welcome_back': '¡Bienvenido de Nuevo!',
       'sign_in_subtitle': 'Inicia sesión para continuar tu viaje',
@@ -678,6 +687,10 @@ class AppLocalizations {
   String get searchResults => translate('search_results');
   String found(String count) => translate('found', [count]);
   String get locationSelected => translate('location_selected');
+
+  String get destination => translate('destination');
+  String get latitude => translate('latitude');
+  String get longitude => translate('longitude');
   String get selectTrip => translate('select_trip');
   String get useTripTemplate => translate('use_trip_template');
   String get cancel => translate('cancel');
