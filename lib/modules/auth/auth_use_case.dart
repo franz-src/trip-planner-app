@@ -14,6 +14,11 @@ class _AuthUseCase implements AuthUseCase {
   final AuthRepository _authRepository;
 
   @override
+  Future<Result<void, AuthError>> logout() async {
+    return await _authRepository.logout();
+  }
+
+  @override
   Future<Result<AppUser, AuthError>> attemptLogin(
     UserCredentials credentials,
   ) async {

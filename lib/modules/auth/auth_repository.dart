@@ -23,6 +23,17 @@ class _AuthRepository implements AuthRepository {
   final FlutterSecureStorage _storage;
 
   @override
+  Future<Result<void, AuthError>> logout() async {
+    try {
+      await _storage.delete(key: StorageKeys.appUserStorageKey);
+
+      return Result.success(null);
+    } catch (e) {
+      return Result.failure(AuthError.unexpected);
+    }
+  }
+
+  @override
   Future<Result<AppUser, AuthError>> attemptLogin(
     UserCredentials credentials,
   ) async {

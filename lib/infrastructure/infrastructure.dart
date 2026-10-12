@@ -31,7 +31,7 @@ Future<void> initialize() async {
 
   // Repositories
   final authRepository = newAuthRepository(database, storage);
-  final appUserRepository = newAppUserRepository(storage);
+  final appUserRepository = newAppUserRepository(storage, database);
   final settingsRepository = newSettingsRepository(preferences);
 
   // Use cases

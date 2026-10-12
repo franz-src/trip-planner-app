@@ -12,6 +12,9 @@ abstract class AuthRepository {
 
   /// A user-attempt to create a new account in the app.
   Future<Result<void, AuthError>> attemptRegister(UserCredentials credentials);
+
+  /// Clears the current session from secure storage.
+  Future<Result<void, AuthError>> logout();
 }
 
 /// Represents a interface for managing auth actions.
@@ -21,4 +24,7 @@ abstract class AuthUseCase {
 
   /// A user-attempt to create a new account in the app.
   Future<Result<void, AuthError>> attemptRegister(UserCredentials credentials);
+
+  /// Ends the current application session.
+  Future<Result<void, AuthError>> logout();
 }
