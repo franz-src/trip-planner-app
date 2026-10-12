@@ -30,7 +30,7 @@ Future<void> initialize() async {
   final preferences = await SharedPreferences.getInstance();
 
   // Repositories
-  final authRepository = newAuthRepository(database);
+  final authRepository = newAuthRepository(database, storage);
   final appUserRepository = newAppUserRepository(storage);
   final settingsRepository = newSettingsRepository(preferences);
 

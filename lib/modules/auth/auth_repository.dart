@@ -1,42 +1,103 @@
+import 'dart:convert';
+
+import 'package:bcrypt/bcrypt.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:trip_planner/shared/constants/constant_storage_keys.dart';
+import 'package:trip_planner/shared/errors/error_auth.dart';
+import 'package:trip_planner/entities/entity_result.dart';
 import 'package:trip_planner/entities/entity_user.dart';
 import 'package:trip_planner/infrastructure/database/database.dart';
 import 'package:trip_planner/modules/auth/auth_spec.dart';
 
-AuthRepository newAuthRepository(NewTripPlannerDatabase database) {
-  return _AuthRepository(database);
+AuthRepository newAuthRepository(
+  NewTripPlannerDatabase database,
+  FlutterSecureStorage storage,
+) {
+  return _AuthRepository(database, storage);
 }
 
 class _AuthRepository implements AuthRepository {
-  const _AuthRepository(this._database);
+  const _AuthRepository(this._database, this._storage);
 
   final NewTripPlannerDatabase _database;
+  final FlutterSecureStorage _storage;
 
   @override
-  Future<void> attemptLogin(UserCredentials credentials) async {
-    final conn = await _database.connection;
-
+  Future<Result<AppUser, AuthError>> attemptLogin(
+    UserCredentials credentials,
+  ) async {
     try {
-      final user = await conn.query(
+      final conn = await _database.connection;
+
+      final users = await conn.query(
         'users',
         where: 'email = ?',
         whereArgs: [credentials.email],
+        limit: 1,
       );
-      if (user.isEmpty) {
-        return;
+      if (users.isEmpty) {
+        return Result.failure(AuthError.invalidCredentials);
       }
+
+      final passwordMatch = BCrypt.checkpw(
+        credentials.password,
+        users.first['password'] as String,
+      );
+      if (!passwordMatch) {
+        return Result.failure(AuthError.invalidCredentials);
+      }
+
+      final user = AppUser.fromJSON(users.first);
+      await _storage.write(
+        key: StorageKeys.appUserStorageKey,
+        value: jsonEncode(user.toJSON()),
+      );
+
+      return Result.success(user);
     } catch (e) {
-      print('failed to login: $e');
+      return Result.failure(AuthError.unexpected);
     }
   }
 
   @override
-  Future<void> attemptRegister(UserCredentials credentials) async {
-    final conn = await _database.connection;
-
+  Future<Result<void, AuthError>> attemptRegister(
+    UserCredentials credentials,
+  ) async {
     try {
-      await conn.insert('users', credentials.toJSON());
+      final conn = await _database.connection;
+
+      final passwordHash = BCrypt.hashpw(
+        credentials.password,
+        BCrypt.gensalt(logRounds: 12),
+      );
+
+      final user = credentials.copyWith(password: passwordHash);
+      await conn.insert('users', user.toJSON());
+
+      return Result.success(null);
     } catch (e) {
-      print('failed to create new account: $e');
+      return Result.failure(AuthError.unexpected);
+    }
+  }
+
+  @override
+  Future<Result<AppUser?, AuthError>> getUserByEmail(String email) async {
+    try {
+      final conn = await _database.connection;
+
+      final users = await conn.query(
+        'users',
+        where: 'email = ?',
+        whereArgs: [email],
+        limit: 1,
+      );
+      if (users.isEmpty) {
+        return Result.success(null);
+      }
+
+      return Result.success(AppUser.fromJSON(users.first));
+    } catch (e) {
+      return Result.failure(AuthError.unexpected);
     }
   }
 }

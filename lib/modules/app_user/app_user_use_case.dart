@@ -1,3 +1,5 @@
+import 'package:trip_planner/shared/errors/error_app_user.dart';
+import 'package:trip_planner/entities/entity_result.dart';
 import 'package:trip_planner/modules/app_user/app_user_spec.dart';
 
 import '../../entities/entity_user.dart';
@@ -12,7 +14,7 @@ class _AppUserUseCase implements AppUserUseCase {
   final AppUserRepository _appUserRepository;
 
   @override
-  Future<AppUser?> getUserInformation() async {
+  Future<Result<AppUser?, AppUserError>> getUserInformation() async {
     return await _appUserRepository.getUserInformation();
   }
 }

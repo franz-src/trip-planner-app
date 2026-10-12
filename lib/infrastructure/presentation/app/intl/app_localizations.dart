@@ -55,6 +55,7 @@ class AppLocalizations {
       'password_required': 'Password cannot be blank',
       'invalid_email': 'Invalid email format',
       'password_too_short': 'Password must be at least 8 characters',
+      'password_too_long': 'Password must not exceed 72 UTF-8 bytes',
       'email_already_registered': "There's already a register with this email",
       'register_error': 'Error during registration',
       'delete_user_error': 'Error deleting user',
@@ -253,6 +254,7 @@ class AppLocalizations {
       'password_required': 'Senha não pode estar em branco',
       'invalid_email': 'Formato de e-mail inválido',
       'password_too_short': 'A senha deve ter pelo menos 8 caracteres',
+      'password_too_long': 'A senha não deve exceder 72 bytes em UTF-8',
       'email_already_registered': 'Já existe um cadastro com este e-mail',
       'register_error': 'Erro ao realizar cadastro',
       'delete_user_error': 'Erro ao deletar usuário',
@@ -450,6 +452,7 @@ class AppLocalizations {
       'password_required': 'La contraseña no puede estar en blanco',
       'invalid_email': 'Formato de correo inválido',
       'password_too_short': 'La contraseña debe tener al menos 8 caracteres',
+      'password_too_long': 'La contraseña no debe superar 72 bytes en UTF-8',
       'email_already_registered': 'Ya existe un registro con este correo',
       'register_error': 'Error al realizar el registro',
       'delete_user_error': 'Error al eliminar usuario',
@@ -660,6 +663,9 @@ class AppLocalizations {
   String get passwordRequired => translate('password_required');
   String get invalidEmail => translate('invalid_email');
   String get passwordTooShort => translate('password_too_short');
+  String get passwordTooLong {
+    return translate('password_too_long');
+  }
   String get emailAlreadyRegistered => translate('email_already_registered');
   String get registerError => translate('register_error');
   String get deleteUserError => translate('delete_user_error');

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:trip_planner/entities/entity_result.dart';
 import 'package:trip_planner/entities/entity_user.dart';
 import 'package:trip_planner/infrastructure/infrastructure.dart';
 
@@ -32,7 +33,12 @@ class AppState with ChangeNotifier {
     _loading = true;
     notifyListeners();
 
-    _appUser = await appUserUseCase.getUserInformation();
+    final userResult = await appUserUseCase.getUserInformation();
+    _appUser = switch (userResult) {
+      Success(:final value) => value,
+      Failure() => null,
+    };
+
     _themeMode = await settingsUseCase.getTheme();
     _locale = await settingsUseCase.getLanguage();
 
